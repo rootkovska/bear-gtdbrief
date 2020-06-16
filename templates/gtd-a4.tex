@@ -1,0 +1,96 @@
+% This is a jinja2 template
+
+\documentclass[
+  10pt,
+  a4paper,
+  twocolumn,
+  portrait,
+]{article}
+
+\usepackage[
+  columnsep=2cm,
+  left=0.5in, right=0.5in,
+  top=0.7in,
+  bottom=0.5in
+]{geometry}
+
+% \usepackage{lmodern}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+
+\usepackage{enumitem, amssymb}
+\newlist{todolist}{itemize}{2}
+\setlist[todolist]{label=$\square$}
+\usepackage{needspace}
+% These will be replaced by joinja parser in output TeX
+\newcommand{\VAR}[1]{#1}
+\newcommand{\BLOCK}[1]{#1}
+
+\title{\vspace{-2cm}
+  {GTD Brief for \VAR{data.date.strftime("%Y-%m-%d")}}\vspace{-2em}}
+\date{\small generated on the \VAR{data.timestamp.strftime("%d @ %H:%M:%S")} UTC}
+\begin{document}
+\pagestyle{myheadings} % Use custom headers
+\maketitle
+% -------------------------------------------
+% -------------------------------------------
+\BLOCK{for list in data.lists}
+\thispagestyle{empty}
+\section*{\VAR{list.title|texscape}}
+\BLOCK{for ctx in list.ctxs}
+\subsection*{\VAR{ctx|texscape}}
+\begin{todolist}
+\BLOCK{for note in list.by_ctx[ctx]}
+\BLOCK{if note.is_overdue(data.date)}
+  \item \textbf{! {\VAR{note.title|texscape} (due: \VAR{note.due_date})}}
+\BLOCK{elif note.is_timestamped()}
+  \item {\VAR{note.title|texscape} (due: \VAR{note.due_date})}
+\BLOCK{else}
+  \item {\VAR{note.title|texscape}}
+\BLOCK{endif}  
+\BLOCK{endfor}
+\end{todolist}
+\BLOCK{endfor}
+% \clearpage
+
+\BLOCK{if list.title == "Nexts"}
+\BLOCK{if data.upcoming.nitems}
+\section*{\VAR{data.upcoming.title|texscape}}
+\begin{todolist}
+\BLOCK{for note in data.upcoming.list|sort(attribute='due_date')}
+  \item {\VAR{note.due_date}: \VAR{note.title|texscape}}
+\BLOCK{endfor}
+\end{todolist}
+\BLOCK{endif}
+\BLOCK{if data.deferred_nodue.nitems}
+\section*{\VAR{data.deferred_nodue.title|texscape}}
+\begin{todolist}
+\BLOCK{for note in data.deferred_nodue.list}
+  \item {\VAR{note.title|texscape}}
+\BLOCK{endfor}
+\end{todolist}
+\BLOCK{endif}
+\BLOCK{endif}
+
+\clearpage
+
+% \BLOCK{if list.nitems > 30}
+% \section*{\VAR{list.title|texscape} Notes}
+% \clearpage
+% \BLOCK{endif}
+\BLOCK{endfor}
+% -------------------------------------------
+\clearpage
+\section*{Projects}
+\BLOCK{for prj in data.projects.prjs}
+\subsection*{\VAR{prj|texscape}}
+\begin{todolist}
+\BLOCK{for note in data.projects.by_prj[prj]}
+  \item {\VAR{note.title|texscape}}
+\BLOCK{endfor}
+\end{todolist}
+\BLOCK{endfor}
+
+\end{document}

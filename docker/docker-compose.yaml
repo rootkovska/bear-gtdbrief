@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  gtdbrief:
+    container_name: gtdbrief
+    build: .
+    image: gtdbrief
+    volumes:
+      - ..:/gtdbrief:ro
+      - ~/Library/Group Containers/9K33E3U3T4.net.shinyfrog.bear/Application Data/:/notes:ro
+      - ../output:/gtdbrief/output:rw

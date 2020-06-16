@@ -1,0 +1,3 @@
+[submodule "pybear"]
+	path = pybear
+	url = ../pybear.git
